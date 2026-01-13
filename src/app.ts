@@ -9,6 +9,7 @@ import { errorHandler } from "./middleware/error";
 import compareRouter from "./routes/compare.route";
 import journalRouter from "./routes/journal.route";
 import summaryRouter from "./routes/summary.route";
+import { prisma } from "./config/prisma";
 
 export function createApp() {
   const app = express();
@@ -28,6 +29,11 @@ export function createApp() {
     const { message } = req.body;
     const out = await llm.summarize(message);
     res.json({ out });
+  });
+  
+  app.get("/db-test", async (_req, res) => {
+    const users = await prisma.user.findMany();
+    res.json(users);
   });
   
   app.use("/compare", compareRouter);

@@ -12,3 +12,31 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  journals  JournalEntry[]
+}
+
+model JournalEntry {
+  id        String   @id @default(uuid())
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  summary   JournalSummary?
+}
+
+model JournalSummary {
+  id        String   @id @default(uuid())
+  entryId   String   @unique
+  content   String
+  createdAt DateTime @default(now())
+
+  entry     JournalEntry @relation(fields: [entryId], references: [id])
+}
