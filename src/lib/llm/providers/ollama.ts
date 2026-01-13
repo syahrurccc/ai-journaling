@@ -1,4 +1,5 @@
 import { LLMProvider, ChatMessage } from "../llm.types";
+import { env } from "../../../config/env";
 
 type OllamaResponse = {
   message: {
@@ -7,8 +8,8 @@ type OllamaResponse = {
 };
 
 export function createOllamaProvider(): LLMProvider {
-  const baseUrl = process.env.OLLAMA_BASE_URL || "http://localhost:11434";
-  const llmModel = process.env.LLM_MODEL || "olmo:instruct";
+  const baseUrl = env.OLLAMA_BASE_URL;
+  const llmModel = env.LLM_MODEL;
 
   async function chat(messages: ChatMessage[]): Promise<string> {
     const res = await fetch(`${baseUrl}/api/chat`, {
@@ -16,7 +17,8 @@ export function createOllamaProvider(): LLMProvider {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: llmModel,
-        messages
+        messages,
+        stream: false,
       })
     });
 

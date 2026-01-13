@@ -6,6 +6,9 @@ import morgan from "morgan";
 import { createLLM } from "./lib/llm/llm.index";
 import { notFound } from "./middleware/notFound";
 import { errorHandler } from "./middleware/error";
+import compareRouter from "./routes/compare.route";
+import journalRouter from "./routes/journal.route";
+import summaryRouter from "./routes/summary.route";
 
 export function createApp() {
   const app = express();
@@ -15,15 +18,21 @@ export function createApp() {
   app.use(cors());
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
-  app.use(morgan("dev"));
+  app.use(morgan("combined"));
   
   app.get("/", (_req, res) => {
     res.json({ status: "ok" });
   });
-  app.get("/test-llm", async (_req, res) => {
-    const out = await llm.summarize("Today I worked on my journaling app and learned Prisma.");
+  
+  app.get("/test-llm", async (req, res) => {
+    const { message } = req.body;
+    const out = await llm.summarize(message);
     res.json({ out });
   });
+  
+  app.use("/compare", compareRouter);
+  app.use("/journal", journalRouter);
+  app.use("/summary", summaryRouter);
 
   app.use(notFound);
   app.use(errorHandler);
