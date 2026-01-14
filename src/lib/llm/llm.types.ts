@@ -3,7 +3,7 @@ export type ChatMessage = {
   content: string;
 };
 
-export interface LLMProvider {
+export type LLMProvider = {
   chat(messages: ChatMessage[]): Promise<string>;
   summarize(text: string): Promise<string>;
 }

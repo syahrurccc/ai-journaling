@@ -3,8 +3,8 @@
     "target": "ES2023",
     "module": "ESNext",
     "moduleResolution": "node",
-    // "verbatimModuleSyntax": true,
-    // "allowImportingTsExtensions": false,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": false,
     "rootDir": "src",
     "outDir": "dist",
 

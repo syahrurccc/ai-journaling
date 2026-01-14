@@ -1,4 +1,4 @@
-import { LLMProvider, ChatMessage } from "../llm.types";
+import type { LLMProvider, ChatMessage } from "../llm.types";
 import { env } from "../../../config/env";
 
 type OllamaResponse = {

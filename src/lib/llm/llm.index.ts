@@ -1,6 +1,6 @@
 import { createOllamaProvider } from "./providers/ollama";
 import { createOpenAIProvider } from "./providers/openai";
-import { LLMProvider } from "./llm.types";
+import type { LLMProvider } from "./llm.types";
 
 export function createLLM(): LLMProvider {
   const provider = process.env.LLM_PROVIDER;

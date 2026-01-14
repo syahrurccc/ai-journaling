@@ -6,6 +6,7 @@ import morgan from "morgan";
 import { createLLM } from "./lib/llm/llm.index";
 import { notFound } from "./middleware/notFound";
 import { errorHandler } from "./middleware/error";
+import authRouter from "./routes/auth.route";
 import compareRouter from "./routes/compare.route";
 import journalRouter from "./routes/journal.route";
 import summaryRouter from "./routes/summary.route";
@@ -36,6 +37,7 @@ export function createApp() {
     res.json(users);
   });
   
+  app.use("/auth", authRouter);
   app.use("/compare", compareRouter);
   app.use("/journal", journalRouter);
   app.use("/summary", summaryRouter);
