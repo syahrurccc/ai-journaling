@@ -27,8 +27,8 @@ export const journalSchema = z
   });
 
 export const journalQuerySchema = z.object({
-  from: z.string().datetime().optional(),
-  to: z.string().datetime().optional(),
+  from: z.iso.date().optional(),
+  to: z.iso.date().optional(),
 });
 
 export const idSchema = z.string().uuid();

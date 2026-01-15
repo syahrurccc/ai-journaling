@@ -1,5 +1,6 @@
 import type { LLMProvider, ChatMessage } from "../llm.types";
 import { env } from "../../../config/env";
+import { SYSTEM_PROMPT } from "../prompts/system.prompt";
 
 type OllamaResponse = {
   message: {
@@ -34,10 +35,16 @@ export function createOllamaProvider(): LLMProvider {
     return chat([
       {
         role: "system",
-        content: "Summarize the following journal entry in 2–3 sentences."
+        content: SYSTEM_PROMPT,
       },
       { role: "user", content: text }
     ]);
+  }
+  
+  async function analyze(text: string) {
+  }
+  
+  async function compare(text: string) {
   }
 
   return { chat, summarize };
