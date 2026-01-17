@@ -1,7 +1,6 @@
 import { prisma } from "../config/prisma";
 import type { Journal, JournalRepository } from "../utils/interfaces";
 import { Prisma } from "../generated/prisma/client";
-import { throwErr } from "../utils/utils";
 
 export function journalRepository(): JournalRepository {
   async function create(
@@ -16,11 +15,10 @@ export function journalRepository(): JournalRepository {
     });
   }
 
-  async function getOne(id: string): Promise<Journal> {
+  async function getOne(id: string): Promise<Journal | null> {
     const journal = await prisma.journalEntry.findUnique({
       where: { id },
     });
-    if (!journal) throwErr("Entry does not exist", 400);
     return journal;
   }
 

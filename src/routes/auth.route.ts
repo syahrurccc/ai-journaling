@@ -2,30 +2,24 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-import { prisma } from "../config/prisma";
 import { registerSchema, loginSchema } from "../validations/zodSchemas";
 import { env } from "../config/env";
+import { userRepository } from "../repository/user.repo";
 
 const router = Router();
+const userRepo = userRepository();
 
 router.post("/register", async (req, res) => {
   const { email, password } = await registerSchema.parseAsync(req.body);
 
-  const exists = await prisma.user.findUnique({
-    where: { email }
-  });
+  const exists = await userRepo.findOne(email);
   if (exists) {
     return res.status(409).json({ error: "Email is already registered" });
   }
 
   const hash = await bcrypt.hash(password, 10);
   
-  await prisma.user.create({
-      data: {
-        email,
-        password: hash
-      }
-    });
+  userRepo.create(email, hash);
 
   res.status(201).json({
     message: "User registered successfully",
@@ -35,7 +29,7 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = loginSchema.parse(req.body);
 
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await userRepo.findOne(email);
   if (!user)
     return res.status(401).json({
       error: "Authentication failed",
@@ -51,7 +45,7 @@ router.post("/login", async (req, res) => {
   // TODO: Create a refresh token
   const token = jwt.sign(
     {
-      id: user.id.toString(),
+      id: user.id,
       email: user.email
     },
     env.JWT_SECRET,

@@ -2,6 +2,7 @@ import { Router } from "express";
 import { idSchema, journalQuerySchema, journalSchema } from "../validations/zodSchemas";
 import { requireAuth } from "../middleware/requireAuth";
 import { journalRepository } from "../repository/journal.repo";
+import { throwErr } from "../utils/utils";
 
 const router = Router();
 const journalRepo = journalRepository();
@@ -27,9 +28,13 @@ router.get("/", requireAuth, async (req, res) => {
 });
 
 router.get("/:id", requireAuth, async (req, res) => {
+  const userId = req.userId!;
   const journalId = idSchema.parse(req.params.id);
   
-  const journal = journalRepo.getOne(journalId);
+  const journal = await journalRepo.getOne(journalId);
+  
+  if (!journal) throwErr("Entry does not exist", 400);
+  if (journal.userId != userId) throwErr("Unauthorized", 401);
   
   res.status(200).json(journal);
 });

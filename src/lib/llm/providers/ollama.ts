@@ -1,6 +1,7 @@
 import type { LLMProvider, ChatMessage } from "../llm.types";
 import { env } from "../../../config/env";
 import { SYSTEM_PROMPT } from "../prompts/system.prompt";
+import { patternPrompt } from "../prompts/patterns.prompt";
 
 type OllamaResponse = {
   message: {
@@ -20,7 +21,7 @@ export function createOllamaProvider(): LLMProvider {
         model: llmModel,
         messages,
         stream: false,
-      })
+      }),
     });
 
     if (!res.ok) {
@@ -30,22 +31,33 @@ export function createOllamaProvider(): LLMProvider {
     const data = (await res.json()) as OllamaResponse;
     return data.message.content;
   }
-
+  
+  // fix the system content for this one
   async function summarize(text: string): Promise<string> {
     return chat([
       {
         role: "system",
         content: SYSTEM_PROMPT,
       },
-      { role: "user", content: text }
+      { role: "user", content: text },
     ]);
   }
-  
-  async function analyze(text: string) {
-  }
-  
-  async function compare(text: string) {
+
+  // async function analyze(text: string) {
+  // }
+
+  // async function compare(text: string) {
+  // }
+
+  async function patternCheck(text: string): Promise<string> {
+    return chat([
+      {
+        role: "system",
+        content: SYSTEM_PROMPT,
+      },
+      { role: "user", content: patternPrompt(text) },
+    ]);
   }
 
-  return { chat, summarize };
+  return { chat, summarize, patternCheck };
 }

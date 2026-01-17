@@ -2,12 +2,6 @@ import { prisma } from "../config/prisma";
 import type { User, UserRepository } from "../utils/interfaces";
 
 export function userRepository(): UserRepository {
-  async function doesExist(email: string): Promise<boolean> {
-    return await prisma.user.findUnique({
-      where: { email },
-    });
-  }
-
   async function create(email: string, password: string): Promise<void> {
     await prisma.user.create({
       data: {
@@ -17,9 +11,9 @@ export function userRepository(): UserRepository {
     });
   }
 
-  async function findOne(email: string): Promise<User | undefined> {
+  async function findOne(email: string): Promise<User | null> {
     return await prisma.user.findUnique({ where: { email } });
   }
 
-  return { doesExist, create, findOne };
+  return { create, findOne };
 }

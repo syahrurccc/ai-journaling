@@ -11,7 +11,7 @@ export type Journal = {
 
 export type JournalRepository = {
   create(userId: string, content: string): Promise<Journal>;
-  getOne(id: string): Promise<Journal>;
+  getOne(id: string): Promise<Journal | null>;
   getMany(userId: string, from?: string, to?: string): Promise<Journal[]>;
   deleteOne(id: string): Promise<void>;
 };
@@ -24,7 +24,6 @@ export type User = {
 };
 
 export type UserRepository = {
-  doesExist(email: string): Promise<boolean>;
   create(email: string, password: string): Promise<void>;
-  findOne(email: string): Promise<User | undefined>;
+  findOne(email: string): Promise<User | null>;
 };
