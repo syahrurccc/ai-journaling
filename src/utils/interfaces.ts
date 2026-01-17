@@ -15,3 +15,16 @@ export type JournalRepository = {
   getMany(userId: string, from?: string, to?: string): Promise<Journal[]>;
   deleteOne(id: string): Promise<void>;
 };
+
+export type User = {
+  id: string;
+  email: string;
+  password: string;
+  createdAt: Date;
+};
+
+export type UserRepository = {
+  doesExist(email: string): Promise<boolean>;
+  create(email: string, password: string): Promise<void>;
+  findOne(email: string): Promise<User | undefined>;
+};

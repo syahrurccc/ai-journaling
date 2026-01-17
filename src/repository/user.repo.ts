@@ -1,7 +1,5 @@
 import { prisma } from "../config/prisma";
 import type { User, UserRepository } from "../utils/interfaces";
-import { Prisma } from "../generated/prisma/client";
-import { throwErr } from "../utils/utils";
 
 export function userRepository(): UserRepository {
   async function doesExist(email: string): Promise<boolean> {
