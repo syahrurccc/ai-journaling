@@ -2,6 +2,7 @@ import { prisma } from "../config/prisma";
 import type { Journal, JournalRepository } from "../utils/interfaces";
 import { Prisma } from "../generated/prisma/client";
 import { validateDates } from "../utils/utils";
+import { JournalNotFoundError, UnauthorizedAccessError } from "../errors/domain";
 
 export function journalRepository(): JournalRepository {
   async function create(userId: string, content: string): Promise<Journal> {
@@ -13,10 +14,12 @@ export function journalRepository(): JournalRepository {
     });
   }
 
-  async function getOne(id: string): Promise<Journal | null> {
+  async function getOne(journalId: string, userId: string): Promise<Journal> {
     const journal = await prisma.journalEntry.findUnique({
-      where: { id },
+      where: { journalId },
     });
+    if (!journal) throw new JournalNotFoundError();
+    if (journal.userId != userId) throw new UnauthorizedAccessError();
     return journal;
   }
 
@@ -44,9 +47,10 @@ export function journalRepository(): JournalRepository {
     });
   }
 
-  async function deleteOne(id: string): Promise<void> {
+  async function deleteOne(journalId: string, userId: string): Promise<void> {
+    const _ = await getOne(journalId, userId);
     await prisma.journalEntry.delete({
-      where: { id },
+      where: { journalId },
     });
   }
 

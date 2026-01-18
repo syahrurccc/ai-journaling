@@ -1,3 +1,4 @@
+import { InvalidDateRangeError } from "../errors/domain";
 import type { Journal } from "./interfaces";
 
 export function throwErr(msg: string, code: number): never {
@@ -33,19 +34,17 @@ ${entry.content}
 export function validateDates(d1?: string, d2?: string){
   const today = toUtcDateOnly(new Date());
   
-  if (!d1) throwErr("Starting date needs to be defined", 400);
+  if (!d1) throw new InvalidDateRangeError();
   const from = new Date(d1);
   
-  if (from > today) {
-    throwErr("Can't be from the future", 400);
-  }
+  if (from > today) throw new InvalidDateRangeError();
   
   if (d1 && d2) {
     const to = new Date(d2);
     if (from > to) {
-      throwErr("Invalid date intervals", 400);
+      throw new InvalidDateRangeError();
     } else if (isMoreThanAWeekApart(from, to)) {
-      throwErr("Date intervals can't be more than a week", 400);
+      throw new InvalidDateRangeError();
     }
   }
 }

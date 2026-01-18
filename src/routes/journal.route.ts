@@ -2,7 +2,6 @@ import { Router } from "express";
 import { idSchema, journalQuerySchema, journalSchema } from "../validations/zodSchemas";
 import { requireAuth } from "../middleware/requireAuth";
 import { journalRepository } from "../repository/journal.repo";
-import { throwErr } from "../utils/utils";
 
 const router = Router();
 const journalRepo = journalRepository();
@@ -10,9 +9,7 @@ const journalRepo = journalRepository();
 router.post("/", requireAuth, async (req, res) => {
   const userId = idSchema.parse(req.userId!);
   const { content } = journalSchema.parse(req.body);
-
   const journal = await journalRepo.create(userId, content);
-  
   res.status(201).json({
     message: "Entry created",
     journal,
@@ -29,23 +26,14 @@ router.get("/", requireAuth, async (req, res) => {
 router.get("/:id", requireAuth, async (req, res) => {
   const userId = idSchema.parse(req.userId!);
   const journalId = idSchema.parse(req.params.id);
-  
-  const journal = await journalRepo.getOne(journalId);
-  if (!journal) throwErr("Entry does not exist", 400);
-  if (journal.userId != userId) throwErr("Unauthorized", 401);
-  
+  const journal = await journalRepo.getOne(journalId, userId);
   res.status(200).json(journal);
 });
 
 router.delete("/:id", requireAuth, async (req, res) => {
   const userId = idSchema.parse(req.userId!);
   const journalId = idSchema.parse(req.params.id);
-  
-  const journal = await journalRepo.getOne(journalId);
-  if (!journal) throwErr("Entry does not exist", 400);
-  if (journal.userId != userId) throwErr("Unauthorized", 401);
-  journalRepo.deleteOne(journal.id);
-  
+  journalRepo.deleteOne(journalId, userId);
   res.status(201).json({ message: "Entry deleted" })
 });
 

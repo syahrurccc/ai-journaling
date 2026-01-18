@@ -1,4 +1,5 @@
 import { prisma } from "../config/prisma";
+import { AuthenticationError } from "../errors/domain";
 import type { User, UserRepository } from "../utils/interfaces";
 
 export function userRepository(): UserRepository {
@@ -11,8 +12,10 @@ export function userRepository(): UserRepository {
     });
   }
 
-  async function findOne(email: string): Promise<User | null> {
-    return await prisma.user.findUnique({ where: { email } });
+  async function findOne(email: string): Promise<User> {
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (!user) throw new AuthenticationError();
+    return user;
   }
 
   return { create, findOne };

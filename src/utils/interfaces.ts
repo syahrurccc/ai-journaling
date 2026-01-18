@@ -11,9 +11,9 @@ export type Journal = {
 
 export type JournalRepository = {
   create(userId: string, content: string): Promise<Journal>;
-  getOne(id: string): Promise<Journal | null>;
+  getOne(id: string, userId: string): Promise<Journal>;
   getMany(userId: string, from?: string, to?: string, qty?: number): Promise<Journal[]>;
-  deleteOne(id: string): Promise<void>;
+  deleteOne(journalId: string, userId: string): Promise<void>;
 };
 
 export type User = {
@@ -25,5 +25,5 @@ export type User = {
 
 export type UserRepository = {
   create(email: string, password: string): Promise<void>;
-  findOne(email: string): Promise<User | null>;
+  findOne(email: string): Promise<User>;
 };

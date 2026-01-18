@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { registerSchema, loginSchema } from "../validations/zodSchemas";
 import { env } from "../config/env";
 import { userRepository } from "../repository/user.repo";
+import { AuthenticationError, EmailAlreadyRegisteredError } from "../errors/domain";
 
 const router = Router();
 const userRepo = userRepository();
@@ -13,9 +14,7 @@ router.post("/register", async (req, res) => {
   const { email, password } = await registerSchema.parseAsync(req.body);
 
   const exists = await userRepo.findOne(email);
-  if (exists) {
-    return res.status(409).json({ error: "Email is already registered" });
-  }
+  if (exists) throw new EmailAlreadyRegisteredError();
 
   const hash = await bcrypt.hash(password, 10);
   
@@ -30,16 +29,9 @@ router.post("/login", async (req, res) => {
   const { email, password } = loginSchema.parse(req.body);
 
   const user = await userRepo.findOne(email);
-  if (!user)
-    return res.status(401).json({
-      error: "Authentication failed",
-    });
 
   const pass = await bcrypt.compare(password, user.password);
-  if (!pass)
-    return res.status(401).json({
-      error: "Authentication failed",
-    });
+  if (!pass) throw new AuthenticationError();
 
   // authorize user
   // TODO: Create a refresh token
