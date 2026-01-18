@@ -12,7 +12,7 @@ export type Journal = {
 export type JournalRepository = {
   create(userId: string, content: string): Promise<Journal>;
   getOne(id: string): Promise<Journal | null>;
-  getMany(userId: string, from?: string, to?: string): Promise<Journal[]>;
+  getMany(userId: string, from?: string, to?: string, qty?: number): Promise<Journal[]>;
   deleteOne(id: string): Promise<void>;
 };
 

@@ -8,9 +8,10 @@ const router = Router();
 const journalRepo = journalRepository();
 
 router.post("/", requireAuth, async (req, res) => {
+  const userId = idSchema.parse(req.userId!);
   const { content } = journalSchema.parse(req.body);
 
-  const journal = await journalRepo.create(req.userId!, content);
+  const journal = await journalRepo.create(userId, content);
   
   res.status(201).json({
     message: "Entry created",
@@ -19,20 +20,17 @@ router.post("/", requireAuth, async (req, res) => {
 });
 
 router.get("/", requireAuth, async (req, res) => {
-  const { from, to } = journalQuerySchema.parse(req.query);
-  const userId = req.userId!
-  
-  const journals = journalRepo.getMany(userId, from, to);
-  
+  const userId = idSchema.parse(req.userId!);
+  const { from, to, qty } = journalQuerySchema.parse(req.query);
+  const journals = journalRepo.getMany(userId, from, to, qty);
   res.status(200).json(journals);
 });
 
 router.get("/:id", requireAuth, async (req, res) => {
-  const userId = req.userId!;
+  const userId = idSchema.parse(req.userId!);
   const journalId = idSchema.parse(req.params.id);
   
   const journal = await journalRepo.getOne(journalId);
-  
   if (!journal) throwErr("Entry does not exist", 400);
   if (journal.userId != userId) throwErr("Unauthorized", 401);
   
@@ -40,8 +38,13 @@ router.get("/:id", requireAuth, async (req, res) => {
 });
 
 router.delete("/:id", requireAuth, async (req, res) => {
+  const userId = idSchema.parse(req.userId!);
   const journalId = idSchema.parse(req.params.id);
-  journalRepo.deleteOne(journalId);
+  
+  const journal = await journalRepo.getOne(journalId);
+  if (!journal) throwErr("Entry does not exist", 400);
+  if (journal.userId != userId) throwErr("Unauthorized", 401);
+  journalRepo.deleteOne(journal.id);
   
   res.status(201).json({ message: "Entry deleted" })
 });

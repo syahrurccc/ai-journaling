@@ -29,6 +29,7 @@ export const journalSchema = z
 export const journalQuerySchema = z.object({
   from: z.iso.date().optional(),
   to: z.iso.date().optional(),
+  qty: z.coerce.number().optional(),
 });
 
 export const idSchema = z.string().uuid();
